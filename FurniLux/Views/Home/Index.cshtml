@@ -1,0 +1,56 @@
+﻿@model IEnumerable<Product>
+
+@{
+    ViewData["Title"] = "Products Gallery";
+}
+
+<h2 class="text-center mb-4">🛋️ Products Gallery</h2>
+
+<div class="container">
+    <div class="row">
+        @foreach (var product in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-lg border-0 rounded-lg">
+                    <img src="~/images/@product.ImageUrl" class="card-img-top" alt="@product.Name" style="height: 250px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text text-muted">@product.Description.Substring(0, Math.Min(product.Description.Length, 50))...</p>
+                        <h6 class="text-primary">$@product.Price</h6>
+                        <span class="badge bg-secondary">Stock: @product.StockQuantity</span>
+                        <span class="badge bg-dark">Color: @product.Color</span>
+                    </div>
+                    <div class="card-footer bg-light d-flex justify-content-between">
+                        <a href="@Url.Action("Details", "Home", new { id = product.Id })" class="btn btn-outline-primary btn-sm">View Details</a>
+                        <a href="@Url.Action("Edit", "Home", new { id = product.Id })" class="btn btn-outline-warning btn-sm">Edit</a>
+                        <a href="#" onclick="confirmDelete(@product.Id)" class="btn btn-outline-danger btn-sm">Delete</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="text-center mt-4">
+    <a href="@Url.Action("Create", "Home")" class="btn btn-success btn-lg">
+        ➕ Add New Product
+    </a>
+</div>
+<script>
+    function confirmDelete(productId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+              
+                window.location.href = 'Home/Delete/'+productId;
+            }
+        });
+    }
+</script>
