@@ -7,6 +7,10 @@ namespace FurniLux.Tools
 
         public static async Task CopyPhotoToEnviroment(Product product, IWebHostEnvironment _env, IFormFile image)
         {
+            if (image == null)
+            {
+                return;
+            }
             var uploadsFolder = Path.Combine(_env.WebRootPath, "images");
             var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
             var filePath = Path.Combine(uploadsFolder, uniqueFileName);

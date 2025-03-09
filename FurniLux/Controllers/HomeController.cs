@@ -38,11 +38,19 @@ namespace FurniLux.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Create(Product product, IFormFile image)
+        public async Task<IActionResult> Create(Product product, IFormFile? image)
         {
-            await FileTools.CopyPhotoToEnviroment(product, _env, image);
-            products.Add(product);
-            return RedirectToAction("Index");
+            if (ModelState.IsValid)
+            {
+
+
+                await FileTools.CopyPhotoToEnviroment(product, _env, image);
+                products.Add(product);
+                return RedirectToAction("Index");
+            }
+            else
+                return View(product);
+
         }
 
         public ActionResult Edit(int id)
@@ -54,28 +62,42 @@ namespace FurniLux.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, Product product, IFormFile image)
+        public async Task<IActionResult> Edit(int id, Product product, IFormFile? image)
         {
-            var ExitedProdect = products.FirstOrDefault(x => x.Id == id);
-            if (ExitedProdect == null)
-                return NotFound();
-            if (image != null)
+            if (ModelState.IsValid)
             {
-                FileTools.DeletePhoto(_env, ExitedProdect.ImageUrl);
-                await FileTools.CopyPhotoToEnviroment(product, _env, image);
+
+
+                var ExitedProdect = products.FirstOrDefault(x => x.Id == id);
+                if (ExitedProdect == null)
+                    return NotFound();
+                if (image != null)
+                {
+                    if (ExitedProdect.ImageUrl != null)
+                    {
+                        FileTools.DeletePhoto(_env, ExitedProdect.ImageUrl);
+                    }
+                    await FileTools.CopyPhotoToEnviroment(product, _env, image);
+                }
+                ExitedProdect.Name = product.Name ?? ExitedProdect.Name;
+                ExitedProdect.StockQuantity = product.StockQuantity;
+                ExitedProdect.ImageUrl = product.ImageUrl ?? ExitedProdect.ImageUrl;
+                ExitedProdect.Dimensions = product.Dimensions ?? ExitedProdect.Dimensions;
+                ExitedProdect.Material = product.Material ?? ExitedProdect.Material;
+                ExitedProdect.Color = product.Color ?? ExitedProdect.Color;
+                ExitedProdect.Price = product.Price;
+                ExitedProdect.Description = product.Description ?? ExitedProdect.Description;
+                ExitedProdect.UpdatedAt = DateTime.UtcNow;
+
+
+                return RedirectToAction("Index");
             }
-            ExitedProdect.Name = product.Name ?? ExitedProdect.Name;
-            ExitedProdect.StockQuantity = product.StockQuantity;
-            ExitedProdect.ImageUrl = product.ImageUrl ?? ExitedProdect.ImageUrl;
-            ExitedProdect.Dimensions = product.Dimensions ?? ExitedProdect.Dimensions;
-            ExitedProdect.Material = product.Material ?? ExitedProdect.Material;
-            ExitedProdect.Color = product.Color ?? ExitedProdect.Color;
-            ExitedProdect.Price = product.Price;
-            ExitedProdect.Description = product.Description ?? ExitedProdect.Description;
-            ExitedProdect.UpdatedAt = DateTime.UtcNow;
+            else
+                return View(product);
 
 
-            return RedirectToAction("Index");
+
+
         }
 
 
@@ -84,7 +106,8 @@ namespace FurniLux.Controllers
             var exited = products.FirstOrDefault(x => x.Id == id);
             if (exited == null)
                 return NotFound();
-            FileTools.DeletePhoto(_env, exited.ImageUrl);
+            if (exited.ImageUrl != "")
+                FileTools.DeletePhoto(_env, exited.ImageUrl!);
             products.Remove(exited);
             return RedirectToAction("Index");
         }

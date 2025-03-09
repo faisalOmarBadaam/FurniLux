@@ -31,11 +31,11 @@
     </div>
 </div>
 
-<div class="text-center mt-4">
-    <a href="@Url.Action("Create", "Home")" class="btn btn-success btn-lg">
-        ➕ Add New Product
-    </a>
-</div>
+<!-- زر الإضافة العائم -->
+<a href="@Url.Action("Create", "Home")" class="btn btn-success floating-btn">
+    <i class="fas fa-plus"></i>
+</a>
+
 <script>
     function confirmDelete(productId) {
         Swal.fire({
@@ -48,8 +48,7 @@
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-              
-                window.location.href = 'Home/Delete/'+productId;
+                window.location.href = 'Home/Delete/' + productId;
             }
         });
     }
